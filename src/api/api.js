@@ -32,8 +32,4 @@ axios.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
-// 定义请求
-export const getCates = params => {
-  return axios.get('/getCates', params).then(res => res.data)
-}
+export default axios
