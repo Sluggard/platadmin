@@ -2,14 +2,15 @@
   <div class="login-container">
     <div class="login-form">
       <a-form
-        labelAlign="right"
+        labelAlign="left"
         layout="horizontal"
         :rules="rules"
         :model="loginForm"
-        :labelCol="{ span: 6 }"
+        :label-col="{ span: 8 }"
+        :wrapper-col="{ span: 16 }"
         ref="loginForm"
       >
-        <div class="title">管理后台</div>
+        <div class="title">房产通管理后台</div>
         <a-form-item label="用户名" name="username">
           <a-input
             v-model:value="loginForm.username"
@@ -22,9 +23,9 @@
             placeholder="请输入密码"
           />
         </a-form-item>
-        <a-form-item label="验证码" name="checkcode">
+        <a-form-item label="验证码" name="checkCode">
           <a-input
-            v-model:value="loginForm.checkcode"
+            v-model:value="loginForm.checkCode"
             placeholder="请输入验证码"
           />
         </a-form-item>
@@ -40,7 +41,7 @@
             登录
           </a-button>
         </a-form-item>
-        <div class="other-login">
+        <!-- <div class="other-login">
           <GithubOutlined
             :style="{ fontSize: '30px' }"
             @click="authorizationCodeLogin"
@@ -53,33 +54,33 @@
             :style="{ fontSize: '30px' }"
             @click="authorizationCodeLogin"
           />
-        </div>
+        </div> -->
       </a-form>
     </div>
   </div>
 </template>
 <script>
 import auth from '@/api/auth'
-import { client, httpConfig } from '@/config/config'
-import {
-  GithubOutlined,
-  QqOutlined,
-  WechatOutlined
-} from '@ant-design/icons-vue'
+import { client, httpConfig, constVar } from '@/config/config'
+// import {
+//   GithubOutlined,
+//   QqOutlined,
+//   WechatOutlined
+// } from '@ant-design/icons-vue'
 
 export default {
   name: 'Login',
-  components: {
-    GithubOutlined,
-    QqOutlined,
-    WechatOutlined
-  },
+  // components: {
+  //   GithubOutlined,
+  //   QqOutlined,
+  //   WechatOutlined
+  // },
   data() {
     return {
       loginForm: {
         username: '',
         password: '',
-        checkcode: '',
+        checkCode: '',
         checkCodePrefix: ''
       },
       checkcodeUrl: '',
@@ -98,7 +99,7 @@ export default {
             trigger: 'blur'
           }
         ],
-        checkcode: [
+        checkCode: [
           {
             required: true,
             message: '请输入验证码',
@@ -111,16 +112,17 @@ export default {
   created() {
     this.changeCheckCode()
   },
-  watch: {
-    $route: {
-      handler: function(route) {
-        if (route.path == '/' && route.query.code) {
-          this.authorizationLogin(this.$route.query.code)
-        }
-      },
-      immediate: true
-    }
-  },
+  // 三方授权登录
+  // watch: {
+  //   $route: {
+  //     handler: function(route) {
+  //       if (route.path == '/' && route.query.code) {
+  //         this.authorizationLogin(this.$route.query.code)
+  //       }
+  //     },
+  //     immediate: true
+  //   }
+  // },
   methods: {
     authorizationCodeLogin() {
       console.log(httpConfig)
@@ -151,34 +153,42 @@ export default {
       })
     },
     login() {
-      this.$refs.loginForm.validate().then(() => {
-        const fromdata = new FormData()
-        fromdata.append('client_id', client.clientId)
-        fromdata.append('client_secret', client.clientSecret)
-        fromdata.append('grant_type', client.grantType)
-        fromdata.append('scope', client.scope)
-        fromdata.append('username', this.loginForm.username)
-        fromdata.append('password', this.loginForm.password)
-        fromdata.append('checkcode', this.loginForm.checkcode)
-        fromdata.append('checkCodePrefix', this.loginForm.checkCodePrefix)
-        auth.login(fromdata).then(res => {
-          if (res.code == 500) {
-            this.$message.warn(res.msg)
-          } else {
-            this.$message.info(res.msg)
-            this.loginSuceess(res)
-          }
+      this.$refs.loginForm
+        .validate()
+        .then(() => {
+          const fromdata = new FormData()
+          fromdata.append('client_id', client.clientId)
+          fromdata.append('client_secret', client.clientSecret)
+          fromdata.append('grant_type', client.grantType)
+          fromdata.append('scope', client.scope)
+          fromdata.append('username', this.loginForm.username)
+          fromdata.append('password', this.loginForm.password)
+          fromdata.append('checkCode', this.loginForm.checkCode)
+          fromdata.append('checkCodePrefix', this.loginForm.checkCodePrefix)
+          auth.login(fromdata).then(res => {
+            if (res.code == 500) {
+              this.$message.warn(res.msg)
+              this.changeCheckCode()
+            } else {
+              this.$message.info('登录成功')
+              this.loginSuceess(res.data)
+            }
+          })
         })
-      })
+        .catch(error => {
+          console.log('error', error)
+        })
     },
     loginSuceess(data) {
       console.log(data)
+      // 将返回token相关信息存储到本地
+      localStorage.setItem(constVar.tokenInfoKey, JSON.stringify(data))
       this.$router.push({ path: '/index' })
     }
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scope>
 .login-container:before {
   background-image: url('https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1607579146045&di=85f551ff866ab8e4b1399d5b85c2ec8c&imgtype=0&src=http%3A%2F%2Fattachments.gfan.com%2Fforum%2F201503%2F19%2F211608ztcq7higicydxhsy.jpg');
   background-size: cover;
@@ -208,9 +218,16 @@ export default {
     width: 600px;
     height: 400px;
     opacity: 0.8;
+
+    input {
+      background-color: transparent;
+    }
+
     label {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 15px;
+      // font-family: 'Courier New', Courier, monospace;
+      font-weight: 600;
+      font-size: 18px;
+      color: #193452;
     }
     .ant-form-item-label > label::after {
       content: '';
@@ -220,10 +237,11 @@ export default {
     }
 
     .title {
-      font-family: 'Courier New', Courier, monospace;
       font-size: 30px;
       font-weight: 600;
       color: #193452;
+      padding-bottom: 30px;
+      letter-spacing: 10px;
     }
     .checkcode-img {
       position: relative;

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { constVar } from '@/config/config'
 axios.defaults.baseURL = 'http://localhost:8200/api'
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
@@ -14,8 +15,11 @@ axios.interceptors.request.use(
     // if (config.method != "get") {
     //   config.data = qs.stringify(config.data);
     // }
-    if (localStorage.getItem('token')) {
-      config.headers.Authorization = localStorage.getItem('token')
+    let tokenInfo = JSON.parse(localStorage.getItem(constVar.tokenInfoKey))
+    console.log(tokenInfo)
+    if (tokenInfo) {
+      config.headers.Authorization =
+        tokenInfo.token_type + ' ' + tokenInfo.access_token
     }
     return config
   },

@@ -10,3 +10,7 @@ export const httpConfig = {
   port: 8200,
   baseUrl: ''
 }
+
+export const constVar = {
+  tokenInfoKey: 'tokenInfo'
+}
