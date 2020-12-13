@@ -20,31 +20,19 @@ export default {
   data() {
     return {
       menuList: [
-        { key: '/index', title: '1' },
         {
-          key: '2',
-          title: '2',
+          key: '/index',
+          title: '系统设置',
           children: [
-            { key: '2-1', title: '2-1' },
-            {
-              key: '2-2',
-              title: '2-2',
-              children: [
-                { key: '2-2-1', title: '2-2-1' },
-                { key: '2-2-2', title: '2-2-2' }
-              ]
-            }
+            { key: '/user', title: '用户管理' },
+            { key: '/userGroup', title: '用户组管理' },
+            { key: '/role', title: '角色管理' },
+            { key: '/menu', title: '菜单管理' },
+            { key: '/resource', title: '资源管理' },
+            { key: '/organization', title: '组织管理' },
+            { key: '/department', title: '职位管理' }
           ]
-        },
-        {
-          key: '3',
-          title: '3',
-          children: [
-            { key: '3-1', title: '3-1' },
-            { key: '3-2', title: '3-2' }
-          ]
-        },
-        { key: '4', title: '4' }
+        }
       ],
       mode: 'inline',
       theme: 'dark',
@@ -69,6 +57,9 @@ export default {
       console.log(item, 'item')
       console.log(key, 'key')
       console.log(keyPath, 'keyPath')
+      if (this.$router.path !== key) {
+        this.$router.push({ path: key })
+      }
     }
   },
   computed: mapState({
@@ -76,3 +67,10 @@ export default {
   })
 }
 </script>
+<style lang="scss" scoped>
+.logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+</style>

@@ -1,11 +1,23 @@
 <template>
-  <a-layout-header style="background: #fff; padding: 0">
-    <menu-unfold-outlined
-      v-if="collapsed"
-      class="trigger"
-      @click="changeCollapsed"
-    />
-    <menu-fold-outlined v-else class="trigger" @click="changeCollapsed" />
+  <a-layout-header id="layout-header">
+    <div class="header-left">
+      <menu-unfold-outlined
+        v-if="collapsed"
+        class="trigger"
+        @click="changeCollapsed"
+      />
+      <menu-fold-outlined v-else class="trigger" @click="changeCollapsed" />
+      <a-breadcrumb :routes="routes">
+        <template #itemRender="{ route, routes, paths }">
+          <span v-if="routes.indexOf(route) === routes.length - 1">
+            {{ route.meta.title }}
+          </span>
+          <router-link v-else :to="`/${paths.join('/')}`">
+            {{ route.meta.title }}
+          </router-link>
+        </template>
+      </a-breadcrumb>
+    </div>
     <a-dropdown class="userinfo" placement="bottomCenter">
       <span>
         <a-avatar shape="square">
@@ -33,21 +45,40 @@
   </a-layout-header>
 </template>
 <script>
-import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
+import {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  UserOutlined
+} from '@ant-design/icons-vue'
 import { mapState, mapMutations } from 'vuex'
 import { constVar } from '@/config/config'
 export default {
   name: 'admin-header',
   data() {
-    return {}
+    return { routes: [] }
   },
   components: {
     MenuUnfoldOutlined,
-    MenuFoldOutlined
+    MenuFoldOutlined,
+    UserOutlined
   },
   computed: mapState({
     collapsed: state => state.collapsed
   }),
+  watch: {
+    $route: {
+      handler: function(route) {
+        console.log(this.routes)
+        console.log(route)
+        if (route.path == '/index') {
+          this.routes = [route.matched[0]]
+        } else {
+          this.routes = route.matched
+        }
+      },
+      immediate: true
+    }
+  },
   methods: {
     ...mapMutations(['changeCollapsed']),
     logout() {
@@ -58,11 +89,43 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.userinfo {
-  float: right;
-  margin: 0 30px;
-  .username {
-    margin: 0 10px;
+#layout-header {
+  background: #fff;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .trigger:hover {
+    color: #1890ff;
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: row;
+
+    .ant-breadcrumb {
+      margin: auto;
+      height: 64px;
+      line-height: 64px;
+      position: relative;
+      bottom: 2px;
+    }
+  }
+
+  .userinfo {
+    float: right;
+    margin: 0 30px;
+    .username {
+      margin: 0 10px;
+    }
   }
 }
 </style>

@@ -7,7 +7,65 @@ const routes = [
     meta: {
       title: '首页'
     },
-    component: () => import('@/views/Index.vue')
+    component: () => import('@/views/Index.vue'),
+    children: [
+      {
+        path: '/userGroup',
+        name: 'userGroup',
+        meta: {
+          title: '用户组管理'
+        },
+        component: () => import('@/views/sys/UpmsUserGroup.vue')
+      },
+      {
+        path: '/user',
+        name: 'user',
+        meta: {
+          title: '用户管理'
+        },
+        component: () => import('@/views/sys/UpmsUser.vue')
+      },
+      {
+        path: '/organization',
+        name: 'organization',
+        meta: {
+          title: '组织管理'
+        },
+        component: () => import('@/views/sys/UpmsOrganization.vue')
+      },
+      {
+        path: '/department',
+        name: 'department',
+        meta: {
+          title: '职位管理'
+        },
+        component: () => import('@/views/sys/UpmsDepartment.vue')
+      },
+      {
+        path: '/role',
+        name: 'role',
+        meta: {
+          title: '角色管理'
+        },
+        component: () => import('@/views/sys/UpmsRole.vue')
+      },
+      {
+        path: '/menu',
+        name: 'menu',
+        meta: {
+          title: '菜单管理'
+        },
+        component: () => import('@/views/sys/UpmsMenu.vue')
+      },
+      {
+        path: '/resource',
+        name: 'resource',
+        meta: {
+          title: '资源管理'
+        },
+        component: () => import('@/views/sys/UpmsResource.vue')
+      }
+    ]
   },
   {
     path: '/',
