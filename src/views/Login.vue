@@ -111,6 +111,7 @@ export default {
   },
   created() {
     this.changeCheckCode()
+    this.clearToken()
   },
   // 三方授权登录
   // watch: {
@@ -166,24 +167,27 @@ export default {
           fromdata.append('checkCode', this.loginForm.checkCode)
           fromdata.append('checkCodePrefix', this.loginForm.checkCodePrefix)
           auth.login(fromdata).then(res => {
-            if (res.code == 500) {
-              this.$message.warn(res.msg)
-              this.changeCheckCode()
-            } else {
+            if (res.code !== 200) {
               this.$message.info('登录成功')
               this.loginSuceess(res.data)
+            } else {
+              this.$message.warn(res.msg)
+              this.changeCheckCode()
             }
           })
         })
         .catch(error => {
+          this.changeCheckCode()
           console.log('error', error)
         })
     },
     loginSuceess(data) {
-      console.log(data)
       // 将返回token相关信息存储到本地
       localStorage.setItem(constVar.tokenInfoKey, JSON.stringify(data))
       this.$router.push({ path: '/index' })
+    },
+    clearToken() {
+      localStorage.removeItem(constVar.tokenInfoKey)
     }
   }
 }
