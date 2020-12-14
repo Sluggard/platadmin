@@ -68,8 +68,7 @@ export default {
   watch: {
     $route: {
       handler: function(route) {
-        console.log(this.routes)
-        console.log(route)
+        route.matched[0].children = []
         if (route.path == '/index') {
           this.routes = [route.matched[0]]
         } else {

@@ -21,7 +21,7 @@ export default {
     return {
       menuList: [
         {
-          key: '/index',
+          key: '/system',
           title: '系统设置',
           children: [
             { key: '/user', title: '用户管理' },
@@ -44,7 +44,18 @@ export default {
   components: {
     menuList
   },
+  created() {
+    if (this.$route.path !== '/index') {
+      this.selectedKeys.push(this.$route.path)
+    }
+    this.defaltOpenKey(this.menuList)
+  },
   watch: {
+    $route(to) {
+      if (to.path == '/index') {
+        this.selectedKeys = []
+      }
+    },
     openKeys(val, oldVal) {
       this.preOpenKeys = oldVal
     },
@@ -53,6 +64,17 @@ export default {
     }
   },
   methods: {
+    defaltOpenKey(menuList) {
+      for (let i = 0; i < menuList.length; i++) {
+        if (menuList[i].children && this.defaltOpenKey(menuList[i].children)) {
+          this.openKeys.push(menuList[i].key)
+        } else if (menuList[i].key == this.$route.path) {
+          this.openKeys.push(menuList[i].key)
+          return true
+        }
+        return false
+      }
+    },
     chooseMenu({ item, key, keyPath }) {
       console.log(item, 'item')
       console.log(key, 'key')

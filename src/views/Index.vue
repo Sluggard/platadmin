@@ -19,10 +19,7 @@ export default {
     AdminSlider
   },
   data() {
-    return {
-      selectedKeys: ['1'],
-      collapsed: false
-    }
+    return {}
   }
 }
 </script>

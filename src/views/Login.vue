@@ -167,7 +167,7 @@ export default {
           fromdata.append('checkCode', this.loginForm.checkCode)
           fromdata.append('checkCodePrefix', this.loginForm.checkCodePrefix)
           auth.login(fromdata).then(res => {
-            if (res.code !== 200) {
+            if (res.code == 200) {
               this.$message.info('登录成功')
               this.loginSuceess(res.data)
             } else {
