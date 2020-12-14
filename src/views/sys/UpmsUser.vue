@@ -1,23 +1,35 @@
 <template>
   <a-row>
-    <a-col>
+    <a-col :span="12">
       <a-space>
         <a-button type="primary">
+          <template #icon>
+            <PlusOutlined />
+          </template>
           添加
         </a-button>
         <a-button type="primary">
-          导入
+          <template #icon>
+            <UploadOutlined />
+          </template>
+          上传
         </a-button>
         <a-button type="primary">
-          导出
+          <template #icon>
+            <DownloadOutlined />
+          </template>
+          下载
         </a-button>
         <a-button type="danger">
+          <template #icon>
+            <DeleteOutlined />
+          </template>
           删除
         </a-button>
       </a-space>
     </a-col>
-    <a-col :offset="4"
-      ><a-form layout="inline" :model="searchForm" @submit="search">
+    <a-col :span="12">
+      <a-form layout="inline" :model="searchForm" @submit="search">
         <a-form-item>
           <a-input v-model:value="searchForm.username" placeholder="用户名">
             <template #prefix
@@ -33,11 +45,10 @@
           </a-input>
         </a-form-item>
         <a-form-item>
-          <a-range-picker v-model:value="value3" @change="onChange" />
-        </a-form-item>
-
-        <a-form-item>
           <a-button type="primary" html-type="submit">
+            <template #icon>
+              <SearchOutlined />
+            </template>
             查询
           </a-button>
         </a-form-item>
@@ -47,11 +58,29 @@
   <a-divider></a-divider>
 </template>
 <script>
+import {
+  DownloadOutlined,
+  UploadOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined
+} from '@ant-design/icons-vue'
 export default {
   name: 'upms-user',
+  components: {
+    DownloadOutlined,
+    UploadOutlined,
+    DeleteOutlined,
+    PlusOutlined,
+    SearchOutlined
+  },
   data() {
     return {
-      searchForm: {}
+      searchForm: {
+        date: '',
+        username: '',
+        gender: ''
+      }
     }
   },
   methods: {
