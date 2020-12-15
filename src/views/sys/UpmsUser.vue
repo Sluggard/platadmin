@@ -56,6 +56,18 @@
     </a-col>
   </a-row>
   <a-divider></a-divider>
+  <a-table :columns="columns" :data-source="data">
+    <a-table-column key="action">
+      <template #action="{ title, record }">
+        <span>{{ title }} </span>
+        {{ record }}
+      </template>
+      <template #locked="{ title, record }">
+        {{ title }}
+        <span>{{ record.enable ? '是' : '否' }} </span>
+      </template>
+    </a-table-column>
+  </a-table>
 </template>
 <script>
 import {
@@ -65,6 +77,142 @@ import {
   PlusOutlined,
   SearchOutlined
 } from '@ant-design/icons-vue'
+const columns = [
+  {
+    title: '用户名',
+    dataIndex: 'username',
+    key: 'username'
+  },
+  {
+    title: '性别',
+    dataIndex: 'gender',
+    key: 'gender'
+  },
+  {
+    title: '头像',
+    dataIndex: 'headPortrait',
+    key: 'headPortrait'
+  },
+  {
+    title: '姓名',
+    dataIndex: 'realName',
+    key: 'realName'
+  },
+  {
+    title: '年龄',
+    dataIndex: 'age',
+    key: 'age'
+  },
+  {
+    title: '身份证号码',
+    dataIndex: 'idNo',
+    key: 'idNo'
+  },
+  {
+    title: '电话号码',
+    dataIndex: 'telephone',
+    key: 'telephone'
+  },
+  {
+    title: '出生日期',
+    dataIndex: 'birthDay',
+    key: 'birthDay'
+  },
+  {
+    title: '状态',
+    dataIndex: 'enable',
+    key: 'enable',
+    slots: { customRender: 'enable' }
+  },
+  {
+    title: '锁定',
+    dataIndex: 'locked',
+    key: 'locked',
+    slots: { customRender: 'locked' }
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
+    key: 'createTime'
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'updateTime',
+    key: 'updateTime'
+  },
+  {
+    title: '操作',
+    key: 'action',
+    slots: { customRender: 'action' }
+  }
+]
+const data = [
+  {
+    username: 'zhangsan',
+    gender: null,
+    headPortrait: null,
+    realName: '张三',
+    age: 20,
+    idNo: '500227199508263122',
+    birthDay: 19950820,
+    enable: true,
+    locked: false,
+    createTime: null,
+    updateTime: null
+  },
+  {
+    username: 'zhangsan',
+    gender: null,
+    headPortrait: null,
+    realName: '张三',
+    age: 20,
+    idNo: '500227199508263122',
+    birthDay: 19950820,
+    enable: true,
+    locked: false,
+    createTime: null,
+    updateTime: null
+  },
+  {
+    username: 'zhangsan',
+    gender: null,
+    headPortrait: null,
+    realName: '张三',
+    age: 20,
+    idNo: '500227199508263122',
+    birthDay: 19950820,
+    enable: true,
+    locked: false,
+    createTime: null,
+    updateTime: null
+  },
+  {
+    username: 'zhangsan',
+    gender: null,
+    headPortrait: null,
+    realName: '张三',
+    age: 20,
+    idNo: '500227199508263122',
+    birthDay: 19950820,
+    enable: true,
+    locked: false,
+    createTime: null,
+    updateTime: null
+  },
+  {
+    username: 'zhangsan',
+    gender: null,
+    headPortrait: null,
+    realName: '张三',
+    age: 20,
+    idNo: '500227199508263122',
+    birthDay: 19950820,
+    enable: true,
+    locked: false,
+    createTime: null,
+    updateTime: null
+  }
+]
 export default {
   name: 'upms-user',
   components: {
@@ -76,6 +224,8 @@ export default {
   },
   data() {
     return {
+      data,
+      columns,
       searchForm: {
         date: '',
         username: '',
