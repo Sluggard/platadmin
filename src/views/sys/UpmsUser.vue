@@ -56,26 +56,55 @@
     </a-col>
   </a-row>
   <a-divider></a-divider>
-  <a-table :columns="columns" :data-source="data">
-    <a-table-column key="action">
-      <template #action="{ title, record }">
-        <span>{{ title }} </span>
-        {{ record }}
-      </template>
-      <template #locked="{ title, record }">
-        {{ title }}
-        <span>{{ record.enable ? '是' : '否' }} </span>
-      </template>
-    </a-table-column>
+  <a-table :columns="columns" :data-source="data" rowKey="id">
+    <template #action="{ record }">
+      <a-space>
+        <a-button size="small" @click="edit(record.id)" type="primary">
+          <template #icon>
+            <EditOutlined />
+          </template>
+          编辑
+        </a-button>
+        <a-button size="small" @click="del(record.id)" type="danger">
+          <template #icon>
+            <DeleteOutlined />
+          </template>
+          删除
+        </a-button>
+      </a-space>
+    </template>
+    <template #headPortrait="{ text }">
+      <img class="head-portrait" :src="text" />
+    </template>
+    <template #gender="{ text }">
+      {{ getGender(text) }}
+    </template>
+
+    <template #locked="{text,record }">
+      <a-switch :checked="text" @change="lockedChange(record)" />
+    </template>
+    <template #enable="{text,record }">
+      <a-switch :checked="text" @change="enableChange(record)" />
+    </template>
+    <template #formatDate="{text }">
+      {{ format(text) }}
+    </template>
+    <template #birthDay="{text }">
+      {{ birthDay(text) }}
+    </template>
   </a-table>
 </template>
 <script>
+import moment from 'moment'
 import {
   DownloadOutlined,
   UploadOutlined,
   DeleteOutlined,
   PlusOutlined,
-  SearchOutlined
+  SearchOutlined,
+  LockOutlined,
+  UserOutlined,
+  EditOutlined
 } from '@ant-design/icons-vue'
 const columns = [
   {
@@ -86,12 +115,14 @@ const columns = [
   {
     title: '性别',
     dataIndex: 'gender',
-    key: 'gender'
+    key: 'gender',
+    slots: { customRender: 'gender' }
   },
   {
     title: '头像',
     dataIndex: 'headPortrait',
-    key: 'headPortrait'
+    key: 'headPortrait',
+    slots: { customRender: 'headPortrait' }
   },
   {
     title: '姓名',
@@ -116,7 +147,8 @@ const columns = [
   {
     title: '出生日期',
     dataIndex: 'birthDay',
-    key: 'birthDay'
+    key: 'birthDay',
+    slots: { customRender: 'birthDay' }
   },
   {
     title: '状态',
@@ -133,12 +165,14 @@ const columns = [
   {
     title: '创建时间',
     dataIndex: 'createTime',
-    key: 'createTime'
+    key: 'createTime',
+    slots: { customRender: 'formatDate' }
   },
   {
     title: '更新时间',
     dataIndex: 'updateTime',
-    key: 'updateTime'
+    key: 'updateTime',
+    slots: { customRender: 'formatDate' }
   },
   {
     title: '操作',
@@ -148,69 +182,81 @@ const columns = [
 ]
 const data = [
   {
+    id: 1,
     username: 'zhangsan',
-    gender: null,
-    headPortrait: null,
+    gender: 'MAN',
+    headPortrait:
+      'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608127667936&di=541f4b27697d6309f11ca898e653412a&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F01%2F20180901190625_wmpeq.thumb.700_0.jpeg',
     realName: '张三',
     age: 20,
+    telephone: 18306079883,
     idNo: '500227199508263122',
     birthDay: 19950820,
     enable: true,
     locked: false,
-    createTime: null,
-    updateTime: null
+    createTime: 1607682214000,
+    updateTime: 1607682214000
   },
   {
+    id: 2,
     username: 'zhangsan',
-    gender: null,
-    headPortrait: null,
+    gender: 'FEMALE',
+    headPortrait:
+      'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608127667936&di=541f4b27697d6309f11ca898e653412a&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F01%2F20180901190625_wmpeq.thumb.700_0.jpeg',
     realName: '张三',
     age: 20,
+    telephone: 18306079883,
     idNo: '500227199508263122',
     birthDay: 19950820,
     enable: true,
     locked: false,
-    createTime: null,
-    updateTime: null
+    createTime: 1607682214000,
+    updateTime: 1607682214000
   },
   {
+    id: 3,
     username: 'zhangsan',
-    gender: null,
+    gender: 'MAN',
     headPortrait: null,
     realName: '张三',
     age: 20,
+    telephone: 18306079883,
     idNo: '500227199508263122',
-    birthDay: 19950820,
+    birthDay: 1607682214000,
     enable: true,
     locked: false,
-    createTime: null,
-    updateTime: null
+    createTime: 1607682214000,
+    updateTime: 1607682214000
   },
   {
+    id: 4,
     username: 'zhangsan',
-    gender: null,
+    gender: 'MAN',
     headPortrait: null,
     realName: '张三',
     age: 20,
+    telephone: 18306079883,
     idNo: '500227199508263122',
-    birthDay: 19950820,
+    birthDay: 1607682214000,
     enable: true,
     locked: false,
-    createTime: null,
-    updateTime: null
+    createTime: 1607682214000,
+    updateTime: 1607682214000
   },
   {
+    id: 5,
     username: 'zhangsan',
-    gender: null,
+    gender: 'MAN',
     headPortrait: null,
     realName: '张三',
     age: 20,
+    telephone: 18306079883,
     idNo: '500227199508263122',
-    birthDay: 19950820,
+    birthDay: 1607682214000,
     enable: true,
     locked: false,
-    createTime: null,
-    updateTime: null
+    createTime: 1607682214000,
+    updateTime: 1607682214000
   }
 ]
 export default {
@@ -220,21 +266,58 @@ export default {
     UploadOutlined,
     DeleteOutlined,
     PlusOutlined,
-    SearchOutlined
+    SearchOutlined,
+    LockOutlined,
+    UserOutlined,
+    EditOutlined
   },
   data() {
     return {
       data,
       columns,
       searchForm: {
-        date: '',
         username: '',
         gender: ''
       }
     }
   },
   methods: {
-    search() {}
+    search() {},
+    lockedChange(record) {
+      this.data.forEach(elemnt => {
+        if (elemnt === record) {
+          elemnt.locked = !elemnt.locked
+        }
+      })
+    },
+    enableChange(record) {
+      this.data.forEach(elemnt => {
+        if (elemnt === record) {
+          elemnt.enable = !elemnt.enable
+        }
+      })
+    },
+    edit(id) {
+      console.log(id)
+    },
+    del(id) {
+      console.log(id)
+    },
+    format(timestamp) {
+      return moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
+    },
+    getGender(gender) {
+      return gender === 'MAN' ? '男' : '女'
+    },
+    birthDay(timestamp) {
+      return moment(timestamp).format('YYYY年MM月DD日')
+    }
   }
 }
 </script>
+<style lang="scss" scoped>
+.head-portrait {
+  width: 60px;
+  height: 60px;
+}
+</style>
