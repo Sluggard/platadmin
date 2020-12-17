@@ -16,7 +16,6 @@ axios.interceptors.request.use(
     //   config.data = qs.stringify(config.data);
     // }
     let tokenInfo = JSON.parse(localStorage.getItem(constVar.tokenInfoKey))
-    console.log(tokenInfo)
     if (tokenInfo) {
       config.headers.Authorization =
         tokenInfo.token_type + ' ' + tokenInfo.access_token
@@ -41,6 +40,9 @@ axios.interceptors.response.use(
           break
         case 403:
           errMsg = '无访问权限'
+          break
+        case 405:
+          errMsg = '请求方法'
           break
         case 408:
           errMsg = '请求超时'

@@ -31,18 +31,41 @@
     <a-col :span="12">
       <a-form layout="inline" :model="searchForm" @submit="search">
         <a-form-item>
-          <a-input v-model:value="searchForm.username" placeholder="用户名">
+          <a-input
+            v-model:value="searchForm.queryParam.username"
+            placeholder="用户名"
+          >
             <template #prefix
               ><UserOutlined style="color:rgba(0,0,0,.25)"
             /></template>
           </a-input>
         </a-form-item>
         <a-form-item>
-          <a-input v-model:value="searchForm.gender" placeholder="性别">
+          <a-select
+            v-model:value="searchForm.queryParam.gender"
+            style="width: 120px"
+            placeholder="请选择"
+            @change="handleGenderChange"
+            allowClear
+          >
+            <a-select-option value="MAN">
+              男
+            </a-select-option>
+            <a-select-option value="FEMALE">
+              女
+            </a-select-option>
+            <a-select-option value="SECRET">
+              保密
+            </a-select-option>
+          </a-select>
+          <!-- <a-input
+            
+            placeholder="性别"
+          >
             <template #prefix
               ><LockOutlined style="color:rgba(0,0,0,.25)"
             /></template>
-          </a-input>
+          </a-input> -->
         </a-form-item>
         <a-form-item>
           <a-button type="primary" html-type="submit">
@@ -56,7 +79,21 @@
     </a-col>
   </a-row>
   <a-divider></a-divider>
-  <a-table :columns="columns" :data-source="data" rowKey="id">
+  <a-table
+    :columns="columns"
+    :data-source="data"
+    rowKey="id"
+    :scroll="{ x: 1800, y: 600 }"
+    @change="change"
+    :pagination="{
+      current: searchForm.current,
+      pageSize: searchForm.pageSize,
+      pageSizeOptions: pagination.pageSizeOptions,
+      showSizeChanger: true,
+      total: pagination.total,
+      showTotal: showTotal
+    }"
+  >
     <template #action="{ record }">
       <a-space>
         <a-button size="small" @click="edit(record.id)" type="primary">
@@ -92,171 +129,117 @@
     <template #birthDay="{text }">
       {{ birthDay(text) }}
     </template>
+    <template #sortNo="{index }">
+      {{ index + 1 }}
+    </template>
   </a-table>
 </template>
 <script>
 import moment from 'moment'
+import userApi from '@/api/user'
 import {
   DownloadOutlined,
   UploadOutlined,
   DeleteOutlined,
   PlusOutlined,
   SearchOutlined,
-  LockOutlined,
   UserOutlined,
   EditOutlined
 } from '@ant-design/icons-vue'
 const columns = [
   {
-    title: '用户名',
-    dataIndex: 'username',
-    key: 'username'
+    width: 80,
+    title: '序号',
+    key: 'sortNo',
+    slots: { customRender: 'sortNo' },
+    fixed: 'left'
   },
   {
+    width: 120,
+    title: '用户名',
+    dataIndex: 'username',
+    key: 'username',
+    fixed: 'left'
+  },
+  {
+    width: 120,
     title: '性别',
     dataIndex: 'gender',
     key: 'gender',
     slots: { customRender: 'gender' }
   },
   {
+    width: 120,
     title: '头像',
     dataIndex: 'headPortrait',
     key: 'headPortrait',
     slots: { customRender: 'headPortrait' }
   },
   {
+    width: 120,
     title: '姓名',
     dataIndex: 'realName',
     key: 'realName'
   },
   {
+    width: 120,
     title: '年龄',
     dataIndex: 'age',
     key: 'age'
   },
   {
+    width: 200,
     title: '身份证号码',
     dataIndex: 'idNo',
     key: 'idNo'
   },
   {
+    width: 150,
     title: '电话号码',
     dataIndex: 'telephone',
     key: 'telephone'
   },
   {
+    width: 150,
     title: '出生日期',
     dataIndex: 'birthDay',
     key: 'birthDay',
     slots: { customRender: 'birthDay' }
   },
   {
+    width: 120,
     title: '状态',
     dataIndex: 'enable',
     key: 'enable',
     slots: { customRender: 'enable' }
   },
   {
+    width: 120,
     title: '锁定',
     dataIndex: 'locked',
     key: 'locked',
     slots: { customRender: 'locked' }
   },
   {
+    width: 200,
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
     slots: { customRender: 'formatDate' }
   },
   {
+    width: 200,
     title: '更新时间',
     dataIndex: 'updateTime',
     key: 'updateTime',
     slots: { customRender: 'formatDate' }
   },
   {
+    width: 180,
     title: '操作',
     key: 'action',
-    slots: { customRender: 'action' }
-  }
-]
-const data = [
-  {
-    id: 1,
-    username: 'zhangsan',
-    gender: 'MAN',
-    headPortrait:
-      'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608127667936&di=541f4b27697d6309f11ca898e653412a&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F01%2F20180901190625_wmpeq.thumb.700_0.jpeg',
-    realName: '张三',
-    age: 20,
-    telephone: 18306079883,
-    idNo: '500227199508263122',
-    birthDay: 19950820,
-    enable: true,
-    locked: false,
-    createTime: 1607682214000,
-    updateTime: 1607682214000
-  },
-  {
-    id: 2,
-    username: 'zhangsan',
-    gender: 'FEMALE',
-    headPortrait:
-      'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1608127667936&di=541f4b27697d6309f11ca898e653412a&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201809%2F01%2F20180901190625_wmpeq.thumb.700_0.jpeg',
-    realName: '张三',
-    age: 20,
-    telephone: 18306079883,
-    idNo: '500227199508263122',
-    birthDay: 19950820,
-    enable: true,
-    locked: false,
-    createTime: 1607682214000,
-    updateTime: 1607682214000
-  },
-  {
-    id: 3,
-    username: 'zhangsan',
-    gender: 'MAN',
-    headPortrait: null,
-    realName: '张三',
-    age: 20,
-    telephone: 18306079883,
-    idNo: '500227199508263122',
-    birthDay: 1607682214000,
-    enable: true,
-    locked: false,
-    createTime: 1607682214000,
-    updateTime: 1607682214000
-  },
-  {
-    id: 4,
-    username: 'zhangsan',
-    gender: 'MAN',
-    headPortrait: null,
-    realName: '张三',
-    age: 20,
-    telephone: 18306079883,
-    idNo: '500227199508263122',
-    birthDay: 1607682214000,
-    enable: true,
-    locked: false,
-    createTime: 1607682214000,
-    updateTime: 1607682214000
-  },
-  {
-    id: 5,
-    username: 'zhangsan',
-    gender: 'MAN',
-    headPortrait: null,
-    realName: '张三',
-    age: 20,
-    telephone: 18306079883,
-    idNo: '500227199508263122',
-    birthDay: 1607682214000,
-    enable: true,
-    locked: false,
-    createTime: 1607682214000,
-    updateTime: 1607682214000
+    slots: { customRender: 'action' },
+    fixed: 'right'
   }
 ]
 export default {
@@ -267,22 +250,40 @@ export default {
     DeleteOutlined,
     PlusOutlined,
     SearchOutlined,
-    LockOutlined,
     UserOutlined,
     EditOutlined
   },
   data() {
     return {
-      data,
+      data: [],
       columns,
+      pagination: {
+        pageSizeOptions: ['10', '20', '50', '100'],
+        total: 10
+      },
       searchForm: {
-        username: '',
-        gender: ''
+        current: 1,
+        pageSize: 10,
+        queryParam: { username: '', gender: null }
       }
     }
   },
+  mounted() {
+    this.search()
+  },
   methods: {
-    search() {},
+    search() {
+      userApi.userPageQuery(this.searchForm).then(res => {
+        if (res.code === 200) {
+          this.data = res.data.records
+          this.searchForm.current = res.data.current
+          this.searchForm.pageSize = res.data.size
+          this.pagination.total = res.data.total
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
+    },
     lockedChange(record) {
       this.data.forEach(elemnt => {
         if (elemnt === record) {
@@ -311,6 +312,19 @@ export default {
     },
     birthDay(timestamp) {
       return moment(timestamp).format('YYYY年MM月DD日')
+    },
+    showTotal: (total, range) => {
+      console.log(total, range)
+      return range[0] + '-' + range[1] + ' 共' + total + '条'
+    },
+    change(pagination) {
+      console.log(pagination)
+      this.searchForm.current = pagination.current
+      this.searchForm.pageSize = pagination.pageSize
+      this.search()
+    },
+    handleGenderChange(value) {
+      this.gender = value
     }
   }
 }
