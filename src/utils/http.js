@@ -17,8 +17,7 @@ axios.interceptors.request.use(
     // }
     let tokenInfo = JSON.parse(localStorage.getItem(constVar.tokenInfoKey))
     if (tokenInfo) {
-      config.headers.Authorization =
-        tokenInfo.token_type + ' ' + tokenInfo.access_token
+      config.headers.Authorization = 'Bearer ' + tokenInfo.access_token
     }
     return config
   },

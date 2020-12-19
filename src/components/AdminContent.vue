@@ -14,3 +14,8 @@ export default {
   name: 'admin-content'
 }
 </script>
+<style lang="scss">
+.ant-layout-content {
+  height: 100%;
+}
+</style>

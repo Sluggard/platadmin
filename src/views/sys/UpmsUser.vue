@@ -1,6 +1,6 @@
 <template>
   <a-row>
-    <a-col :span="12">
+    <a-col :span="10">
       <a-space>
         <a-button type="primary">
           <template #icon>
@@ -28,12 +28,22 @@
         </a-button>
       </a-space>
     </a-col>
-    <a-col :span="12">
+    <a-col :span="14">
       <a-form layout="inline" :model="searchForm" @submit="search">
         <a-form-item>
           <a-input
             v-model:value="searchForm.queryParam.username"
             placeholder="用户名"
+          >
+            <template #prefix
+              ><UserOutlined style="color:rgba(0,0,0,.25)"
+            /></template>
+          </a-input>
+        </a-form-item>
+        <a-form-item>
+          <a-input
+            v-model:value="searchForm.queryParam.realName"
+            placeholder="姓名"
           >
             <template #prefix
               ><UserOutlined style="color:rgba(0,0,0,.25)"
@@ -80,10 +90,11 @@
   </a-row>
   <a-divider></a-divider>
   <a-table
+    size="small"
     :columns="columns"
     :data-source="data"
     rowKey="id"
-    :scroll="{ x: 1800, y: 600 }"
+    :scroll="{ x: 1800, y: 400 }"
     @change="change"
     :pagination="{
       current: searchForm.current,
@@ -264,7 +275,7 @@ export default {
       searchForm: {
         current: 1,
         pageSize: 10,
-        queryParam: { username: '', gender: null }
+        queryParam: { realName: null, username: null, gender: null }
       }
     }
   },
