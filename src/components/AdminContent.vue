@@ -17,5 +17,6 @@ export default {
 <style lang="scss">
 .ant-layout-content {
   height: 100%;
+  min-width: 1250px;
 }
 </style>

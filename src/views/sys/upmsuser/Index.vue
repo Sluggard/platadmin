@@ -2,7 +2,7 @@
   <a-row>
     <a-col :span="10">
       <a-space>
-        <a-button type="primary">
+        <a-button type="primary" @click="toAdd">
           <template #icon>
             <PlusOutlined />
           </template>
@@ -10,17 +10,23 @@
         </a-button>
         <a-button type="primary">
           <template #icon>
-            <UploadOutlined />
+            <DownloadOutlined />
           </template>
-          上传
+          excel导出
         </a-button>
         <a-button type="primary">
           <template #icon>
             <DownloadOutlined />
           </template>
-          下载
+          excel模板下载
         </a-button>
-        <a-button type="danger">
+        <a-button type="primary">
+          <template #icon>
+            <UploadOutlined />
+          </template>
+          excel导入
+        </a-button>
+        <a-button type="danger" @click="batchDel">
           <template #icon>
             <DeleteOutlined />
           </template>
@@ -94,7 +100,7 @@
     :columns="columns"
     :data-source="data"
     rowKey="id"
-    :scroll="{ x: 1800, y: 400 }"
+    :scroll="scrollSize"
     @change="change"
     :pagination="{
       current: searchForm.current,
@@ -104,6 +110,7 @@
       total: pagination.total,
       showTotal: showTotal
     }"
+    :row-selection="rowSelection"
   >
     <template #action="{ record }">
       <a-space>
@@ -113,7 +120,7 @@
           </template>
           编辑
         </a-button>
-        <a-button size="small" @click="del(record.id)" type="danger">
+        <a-button size="small" @click="del(record)" type="danger">
           <template #icon>
             <DeleteOutlined />
           </template>
@@ -127,7 +134,6 @@
     <template #gender="{ text }">
       {{ getGender(text) }}
     </template>
-
     <template #locked="{text,record }">
       <a-switch :checked="text" @change="lockedChange(record)" />
     </template>
@@ -148,7 +154,10 @@
 <script>
 import moment from 'moment'
 import userApi from '@/api/user'
+import { createVNode } from 'vue'
+import { Modal } from 'ant-design-vue'
 import {
+  QuestionOutlined,
   DownloadOutlined,
   UploadOutlined,
   DeleteOutlined,
@@ -246,7 +255,7 @@ const columns = [
     slots: { customRender: 'formatDate' }
   },
   {
-    width: 180,
+    width: 160,
     title: '操作',
     key: 'action',
     slots: { customRender: 'action' },
@@ -266,23 +275,47 @@ export default {
   },
   data() {
     return {
+      addModal: true,
       data: [],
+      deletedIds: [],
       columns,
+      scrollSize: { x: 1800, y: 400 },
       pagination: {
-        pageSizeOptions: ['10', '20', '50', '100'],
+        pageSizeOptions: ['8', '10', '20', '50'],
         total: 10
       },
       searchForm: {
         current: 1,
-        pageSize: 10,
+        pageSize: 8,
         queryParam: { realName: null, username: null, gender: null }
+      },
+      rowSelection: {
+        onChange: selectedRowKeys => {
+          this.deletedIds = selectedRowKeys
+        }
+        // onSelect: (record, selected, selectedRows) => {
+        //   this.deletedIds.push(record)
+        //   console.log(record, selected, selectedRows)
+        // },
+        // onSelectAll: (selected, selectedRows, changeRows) => {
+        //   console.log(selected, selectedRows, changeRows)
+        // }
       }
     }
   },
   mounted() {
     this.search()
   },
+  created() {
+    window.addEventListener('resize', this.resizeWindow)
+    this.resizeWindow()
+  },
   methods: {
+    resizeWindow() {
+      if (window.innerHeight - 320 > this.scrollSize.y) {
+        this.scrollSize.y = window.innerHeight - 320
+      }
+    },
     search() {
       userApi.userPageQuery(this.searchForm).then(res => {
         if (res.code === 200) {
@@ -296,24 +329,86 @@ export default {
       })
     },
     lockedChange(record) {
-      this.data.forEach(elemnt => {
-        if (elemnt === record) {
-          elemnt.locked = !elemnt.locked
+      let params = {
+        id: record.id,
+        status: !record.enable
+      }
+      userApi.lockStatus(params).then(res => {
+        if (res.code === 200) {
+          this.data.forEach(elemnt => {
+            if (elemnt === record) {
+              elemnt.locked = !elemnt.locked
+            }
+          })
+        } else {
+          this.$message.error(res.msg)
         }
       })
     },
     enableChange(record) {
-      this.data.forEach(elemnt => {
-        if (elemnt === record) {
-          elemnt.enable = !elemnt.enable
+      let params = {
+        id: record.id,
+        status: !record.enable
+      }
+      userApi.changeStatus(params).then(res => {
+        if (res.code === 200) {
+          this.data.forEach(elemnt => {
+            if (elemnt === record) {
+              elemnt.enable = !elemnt.enable
+            }
+          })
+        } else {
+          this.$message.error(res.msg)
         }
       })
     },
-    edit(id) {
-      console.log(id)
+    toAdd() {
+      this.$router.push({ path: '/userInfo', query: { type: 0 } })
     },
-    del(id) {
-      console.log(id)
+    edit(id) {
+      this.$router.push({ path: '/userInfo', query: { type: 1, id: id } })
+    },
+    batchDel() {
+      let that = this
+      Modal.confirm({
+        title: '提示',
+        icon: createVNode(QuestionOutlined),
+        content: '确定删除选中用户吗？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk() {
+          userApi.deleteUser(that.deletedIds).then(res => {
+            console.log(res.code)
+            if (res.code === 200) {
+              that.$message.info('删除成功！')
+              that.search()
+            } else {
+              that.$message.error('删除失败！')
+            }
+          })
+        }
+      })
+    },
+    del(record) {
+      let that = this
+      Modal.confirm({
+        title: '提示',
+        icon: createVNode(QuestionOutlined),
+        content: '确定删除用户【' + record.realName + '】吗？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk() {
+          userApi.deleteUser(record.id).then(res => {
+            console.log(res.code)
+            if (res.code === 200) {
+              that.$message.info('删除成功！')
+              that.search()
+            } else {
+              that.$message.error('删除失败！')
+            }
+          })
+        }
+      })
     },
     format(timestamp) {
       return moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
@@ -325,11 +420,9 @@ export default {
       return moment(timestamp).format('YYYY年MM月DD日')
     },
     showTotal: (total, range) => {
-      console.log(total, range)
       return range[0] + '-' + range[1] + ' 共' + total + '条'
     },
     change(pagination) {
-      console.log(pagination)
       this.searchForm.current = pagination.current
       this.searchForm.pageSize = pagination.pageSize
       this.search()

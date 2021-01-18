@@ -23,7 +23,15 @@ const routes = [
         meta: {
           title: '用户管理'
         },
-        component: () => import('@/views/sys/UpmsUser.vue')
+        component: () => import('@/views/sys/upmsuser/Index.vue')
+      },
+      {
+        path: '/userInfo',
+        name: 'userInfo',
+        meta: {
+          title: '编辑用户'
+        },
+        component: () => import('@/views/sys/upmsuser/UserInfo.vue')
       },
       {
         path: '/organization',
@@ -68,12 +76,16 @@ const routes = [
     ]
   },
   {
-    path: '/',
+    path: '/login',
     name: 'login',
     meta: {
       title: '登录'
     },
     component: () => import('@/views/Login.vue')
+  },
+  {
+    path: '/:pathMatch(.*)',
+    redirect: '/login'
   }
 ]
 

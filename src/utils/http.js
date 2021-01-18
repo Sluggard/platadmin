@@ -1,4 +1,7 @@
 import axios from 'axios'
+import router from '@/router'
+import store from '@/store'
+import { message } from 'ant-design-vue'
 import { constVar } from '@/config/config'
 axios.defaults.baseURL = 'http://localhost:8200/api'
 axios.defaults.headers.post['Content-Type'] =
@@ -36,6 +39,7 @@ axios.interceptors.response.use(
       switch (err.response.status) {
         case 401:
           errMsg = '登陆状态失效,请重新登录'
+          router.replace({ path: '/login' })
           break
         case 403:
           errMsg = '无访问权限'
@@ -62,7 +66,8 @@ axios.interceptors.response.use(
     } else {
       errMsg = err
     }
-    this.$message.error(errMsg)
+    store.commit('closeLoading')
+    message.error(errMsg)
     return Promise.reject(errMsg)
   }
 )
