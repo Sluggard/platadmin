@@ -22,17 +22,20 @@
       <span>
         <a-avatar shape="square">
           <template #icon>
-            <UserOutlined />
+            <img v-if="user && user.headPortrait" :src="user.headPortrait" />
+            <UserOutlined v-else />
           </template>
         </a-avatar>
-        <span class="username">系统管理员</span>
+        <span class="username">{{
+          user && user.realName ? user.realName : ''
+        }}</span>
       </span>
       <template #overlay>
         <a-menu>
           <a-menu-item>
             <span>个人信息</span>
           </a-menu-item>
-          <a-menu-item>
+          <a-menu-item @click="openChangePassword">
             <span>修改密码</span>
           </a-menu-item>
           <a-menu-divider />
@@ -52,10 +55,14 @@ import {
 } from '@ant-design/icons-vue'
 import { mapState, mapMutations } from 'vuex'
 import { constVar } from '@/config/config'
+
 export default {
   name: 'admin-header',
   data() {
-    return { routes: [] }
+    return {
+      routes: [],
+      user: null
+    }
   },
   components: {
     MenuUnfoldOutlined,
@@ -65,6 +72,7 @@ export default {
   computed: mapState({
     collapsed: state => state.collapsed
   }),
+
   watch: {
     $route: {
       handler: function(route) {
@@ -125,6 +133,18 @@ export default {
     .username {
       margin: 0 10px;
     }
+  }
+}
+.checkcode-img {
+  position: relative;
+  top: -60px;
+  left: 180px;
+  float: right;
+  height: 0px;
+
+  img {
+    height: 34px;
+    width: 120px;
   }
 }
 </style>

@@ -35,6 +35,7 @@
         </div>
         <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
           <a-button
+            :loading="loading"
             @click="login"
             style="width: 120px; opacity: 0.8;"
             type="primary"
@@ -78,6 +79,7 @@ export default {
   // },
   data() {
     return {
+      loading: false,
       loginForm: {
         username: '',
         password: '',
@@ -127,7 +129,6 @@ export default {
   // },
   methods: {
     authorizationCodeLogin() {
-      console.log(httpConfig)
       window.location.href = `http://${httpConfig.host}:${httpConfig.port}/api/auth/oauth/authorize?response_type=code&client_id=${client.clientId}&redirect_uri=${client.redirectUri}&scope=${client.scope}`
     },
     changeCheckCode() {
@@ -158,6 +159,7 @@ export default {
       this.$refs.loginForm
         .validate()
         .then(() => {
+          this.loading = true
           const fromdata = new FormData()
           fromdata.append('client_id', client.clientId)
           fromdata.append('client_secret', client.clientSecret)
@@ -167,15 +169,23 @@ export default {
           fromdata.append('password', this.loginForm.password)
           fromdata.append('checkCode', this.loginForm.checkCode)
           fromdata.append('checkCodePrefix', this.loginForm.checkCodePrefix)
-          auth.login(fromdata).then(res => {
-            if (res.code == 200) {
-              this.$message.info('登录成功')
-              this.loginSuceess(res.data)
-            } else {
-              this.$message.warn(res.msg)
-              this.changeCheckCode()
-            }
-          })
+          console.log(auth.login(fromdata))
+          auth
+            .login(fromdata)
+            .then(res => {
+              this.loading = false
+              if (res.code == 200) {
+                this.$message.info('登录成功')
+                this.loginSuceess(res.data)
+              } else {
+                this.$message.warn(res.msg)
+                this.changeCheckCode()
+              }
+            })
+            .catch(error => {
+              this.loading = false
+              console.log('error', error)
+            })
         })
         .catch(error => {
           this.changeCheckCode()

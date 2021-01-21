@@ -1,6 +1,6 @@
 <template>
   <a-row>
-    <a-col :span="10">
+    <a-col class="excel" :span="10">
       <a-space>
         <a-button type="primary" @click="toAdd">
           <template #icon>
@@ -8,24 +8,28 @@
           </template>
           添加
         </a-button>
-        <a-button type="primary">
+        <a-button type="primary" @click="exportExcel">
           <template #icon>
             <DownloadOutlined />
           </template>
           excel导出
         </a-button>
-        <a-button type="primary">
+        <a-button type="primary" @click="templateDownload">
           <template #icon>
             <DownloadOutlined />
           </template>
           excel模板下载
         </a-button>
-        <a-button type="primary">
-          <template #icon>
-            <UploadOutlined />
-          </template>
-          excel导入
-        </a-button>
+        <a-upload
+          :accept="accept"
+          :showUploadList="false"
+          name="file"
+          :action="action"
+          :headers="headers"
+          @change="uploadSuccess"
+        >
+          <a-button> <UploadOutlined /> excel导入 </a-button>
+        </a-upload>
         <a-button type="danger" @click="batchDel">
           <template #icon>
             <DeleteOutlined />
@@ -156,6 +160,7 @@ import moment from 'moment'
 import userApi from '@/api/user'
 import { createVNode } from 'vue'
 import { Modal } from 'ant-design-vue'
+import { constVar, uploads } from '@/config/config'
 import {
   QuestionOutlined,
   DownloadOutlined,
@@ -300,6 +305,14 @@ export default {
         // onSelectAll: (selected, selectedRows, changeRows) => {
         //   console.log(selected, selectedRows, changeRows)
         // }
+      },
+      accept:
+        'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      action: uploads.userInfoUrl,
+      headers: {
+        authorization:
+          'Bearer ' +
+          JSON.parse(localStorage.getItem(constVar.tokenInfoKey)).access_token
       }
     }
   },
@@ -429,6 +442,46 @@ export default {
     },
     handleGenderChange(value) {
       this.gender = value
+    },
+    exportExcel() {
+      userApi.export(this.searchForm.queryParam).then(res => {
+        const link = document.createElement('a')
+        const blob = new Blob([res], {
+          type:
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        })
+        link.style.display = 'none'
+        link.href = URL.createObjectURL(blob)
+        link.download = '统计表' // 下载的文件名
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+    },
+    templateDownload() {
+      userApi.templateExport().then(res => {
+        const link = document.createElement('a')
+        const blob = new Blob([res], {
+          type:
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        })
+        link.style.display = 'none'
+        link.href = URL.createObjectURL(blob)
+        link.download = '统计表' // 下载的文件名
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+    },
+    uploadSuccess(info) {
+      if (info.file.status === 'done') {
+        if (info.file.response.code === 200) {
+          this.$message.info('上传成功')
+          this.search()
+        } else {
+          this.$message.error('上传失败，请稍后再试')
+        }
+      }
     }
   }
 }
@@ -437,5 +490,8 @@ export default {
 .head-portrait {
   width: 60px;
   height: 60px;
+}
+.excel {
+  margin-top: 4px;
 }
 </style>

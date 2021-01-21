@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
+    user: null,
     collapsed: false,
     submitLoading: false
   },
@@ -16,6 +17,10 @@ export default createStore({
       state.submitLoading = false
     }
   },
-  actions: {},
+  actions: {
+    loginUser(user, state) {
+      state.user = user
+    }
+  },
   modules: {}
 })

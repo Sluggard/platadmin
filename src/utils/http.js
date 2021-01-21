@@ -2,8 +2,8 @@ import axios from 'axios'
 import router from '@/router'
 import store from '@/store'
 import { message } from 'ant-design-vue'
-import { constVar } from '@/config/config'
-axios.defaults.baseURL = 'http://localhost:8200/api'
+import { constVar, httpConfig } from '@/config/config'
+axios.defaults.baseURL = `http://${httpConfig.host}:${httpConfig.port}/api`
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
 
